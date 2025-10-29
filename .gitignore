@@ -102,3 +102,6 @@ yarn-error.log*
 
 # Flipper
 .flipper/
+
+# Expo folder
+.expo/
