@@ -2,18 +2,18 @@
 
 ## Phase 1: Foundation Setup (Days 1-3)
 
-### 1.1 OpenTelemetry SDK Integration
-- [ ] Install OpenTelemetry packages:
-  - `@opentelemetry/api`
-  - `@opentelemetry/sdk-node`
-  - `@opentelemetry/auto-instrumentations-node`
-  - `@opentelemetry/exporter-jaeger`
-  - `@opentelemetry/exporter-otlp-http`
+### 1.1 Honeycomb OpenTelemetry React Native SDK Integration
+- [ ] Install Honeycomb React Native SDK:
+  - `@honeycombio/opentelemetry-react-native`
+  - `@opentelemetry/api` (for manual instrumentation)
 - [ ] Create `src/telemetry/` directory structure
-- [ ] Implement `OtelProvider.tsx` - OpenTelemetry initialization
-- [ ] Create `telemetry.ts` - SDK configuration
-- [ ] Add Honeycomb exporter configuration
-- [ ] Test basic span creation and export
+- [ ] Implement `HoneycombSDK.ts` - SDK initialization and configuration
+- [ ] Create `TelemetryProvider.tsx` - React context wrapper
+- [ ] Configure automatic instrumentations (fetch, error handling, event loop)
+- [ ] Add React Navigation instrumentation with NavigationInstrumentation
+- [ ] Add Honeycomb API key and service name configuration
+- [ ] Test basic span creation and export to Honeycomb
+- [ ] Configure development vs production telemetry settings
 
 ### 1.2 Project Structure
 ```

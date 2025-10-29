@@ -21,13 +21,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     reactNativeDelegate = delegate
     reactNativeFactory = factory
 
+    // Set up the module name and initial props
+    factory.moduleName = "AstronomyShopRN"
+    factory.initialProps = nil
+
+    // Create window
     window = UIWindow(frame: UIScreen.main.bounds)
 
-    factory.startReactNative(
+    // Create root view using the factory's rootViewFactory
+    let rootView = factory.rootViewFactory.view(
       withModuleName: "AstronomyShopRN",
-      in: window,
+      initialProperties: nil,
       launchOptions: launchOptions
     )
+
+    // Create and configure view controller
+    let rootViewController = UIViewController()
+    rootViewController.view = rootView
+    window?.rootViewController = rootViewController
+    window?.makeKeyAndVisible()
 
     return true
   }

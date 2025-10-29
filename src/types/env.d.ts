@@ -6,6 +6,4 @@ declare module '@env' {
   export const ENABLE_TELEMETRY: string;
   export const DEBUG_MODE: string;
   export const LOG_LEVEL: string;
-  export const JAEGER_ENDPOINT: string;
-  export const JAEGER_ENABLED: string;
 }
