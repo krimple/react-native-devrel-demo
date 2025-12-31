@@ -24,7 +24,10 @@ function onTraceClick() {
     .getTracer('astronomy-shop-example')
     .startSpan('button-click');
   console.log('the trace button was clicked!');
-  span.end();
+  
+  setTimeout(() => {
+    span.end();
+  },2000);
 }
 
 export default function App() {

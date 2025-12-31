@@ -27,3 +27,11 @@ cd ios
 pod install
 ```
 
+## Troubleshooting
+
+* Check Hermes errors - sometimes on iOS the Node folder is the wrong one from another configuration. Fix with
+
+```
+pod deintegrate && pod install
+```
+
