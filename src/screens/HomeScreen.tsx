@@ -40,6 +40,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation, sdk }) => {
       <Text style={styles.subtitle}>React Native OpenTelemetry Demo</Text>
 
       <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => navigation.navigate('ProductList')}
+        >
+          <Text style={styles.primaryButtonText}>🛒 Browse Products</Text>
+        </TouchableOpacity>
         <Button
           onPress={onTraceClick}
           title="Send a trace"
@@ -88,6 +94,17 @@ const styles = StyleSheet.create({
   buttonContainer: {
     gap: 12,
     width: '80%',
+  },
+  primaryButton: {
+    backgroundColor: '#841584',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  primaryButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   settingsButton: {
     backgroundColor: '#f0f0f0',

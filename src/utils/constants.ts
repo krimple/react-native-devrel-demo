@@ -5,9 +5,9 @@ export const API_BASE_URL = __DEV__
 export const DEFAULT_CURRENCY = 'USD';
 
 export const STORAGE_KEYS = {
-  SELECTED_CURRENCY: 'selectedCurrency',
-  CART_ITEMS: 'cartItems',
-  USER_PREFERENCES: 'userPreferences',
+  selectedCurrency: '@currency_selected',
+  cartItems: '@cart_items',
+  userPreferences: '@user_preferences',
 } as const;
 
 export const TELEMETRY_CONFIG = {
@@ -26,23 +26,27 @@ export const SCREEN_NAMES = {
 } as const;
 
 export const COLORS = {
-  PRIMARY: '#6366f1',
-  SECONDARY: '#f59e0b',
-  SUCCESS: '#10b981',
-  ERROR: '#ef4444',
-  WARNING: '#f59e0b',
-  INFO: '#3b82f6',
-  LIGHT: '#f3f4f6',
-  DARK: '#1f2937',
-  WHITE: '#ffffff',
-  BLACK: '#000000',
+  primary: '#6366f1',
+  primaryLight: '#eef2ff',
+  secondary: '#f59e0b',
+  success: '#10b981',
+  error: '#ef4444',
+  warning: '#f59e0b',
+  info: '#3b82f6',
+  background: '#f3f4f6',
+  white: '#ffffff',
+  black: '#000000',
+  text: '#1f2937',
+  textSecondary: '#6b7280',
+  border: '#e5e7eb',
+  disabled: '#d1d5db',
 } as const;
 
 export const SPACING = {
-  XS: 4,
-  SM: 8,
-  MD: 16,
-  LG: 24,
-  XL: 32,
-  XXL: 48,
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48,
 } as const;

@@ -10,6 +10,8 @@ import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { HoneycombReactNativeSDK } from '@honeycombio/opentelemetry-react-native';
 import { DiagLogLevel } from '@opentelemetry/api';
 import { ConfigProvider, useConfig } from './src/context/ConfigContext';
+import { CurrencyProvider } from './src/context/CurrencyContext';
+import { CartProvider } from './src/context/CartContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 
 /**
@@ -17,7 +19,7 @@ import { AppNavigator } from './src/navigation/AppNavigator';
  * Handles SDK initialization with configured endpoints
  */
 function AppContent() {
-  const { otelEndpoint, isLoading } = useConfig();
+  const { otelEndpoint, apiEndpoint, isLoading } = useConfig();
   const [sdk, setSdk] = useState<HoneycombReactNativeSDK | null>(null);
 
   useEffect(() => {
@@ -51,7 +53,13 @@ function AppContent() {
     );
   }
 
-  return <AppNavigator sdk={sdk} />;
+  return (
+    <CurrencyProvider apiEndpoint={apiEndpoint}>
+      <CartProvider>
+        <AppNavigator sdk={sdk} />
+      </CartProvider>
+    </CurrencyProvider>
+  );
 }
 
 /**

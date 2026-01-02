@@ -8,6 +8,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { HomeScreen } from '../screens/HomeScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { ProductListScreen } from '../screens/ProductListScreen';
+import { ProductDetailScreen } from '../screens/ProductDetailScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -41,6 +43,16 @@ export const AppNavigator: React.FC<AppNavigatorProps> = ({ sdk }) => {
           name="Settings"
           component={SettingsScreen}
           options={{ title: 'Settings' }}
+        />
+        <Stack.Screen
+          name="ProductList"
+          component={ProductListScreen}
+          options={{ title: 'Products' }}
+        />
+        <Stack.Screen
+          name="ProductDetail"
+          component={ProductDetailScreen}
+          options={{ title: 'Product Details' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
