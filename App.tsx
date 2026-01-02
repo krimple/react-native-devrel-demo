@@ -5,79 +5,72 @@
  * @format
  */
 
-import React, { useState } from 'react';
-import { Button, Platform, Text, View, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { HoneycombReactNativeSDK } from '@honeycombio/opentelemetry-react-native';
-import { DiagLogLevel, trace } from '@opentelemetry/api';
+import { DiagLogLevel } from '@opentelemetry/api';
+import { ConfigProvider, useConfig } from './src/context/ConfigContext';
+import { AppNavigator } from './src/navigation/AppNavigator';
 
-const localhost = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+/**
+ * Inner App Component
+ * Handles SDK initialization with configured endpoints
+ */
+function AppContent() {
+  const { otelEndpoint, isLoading } = useConfig();
+  const [sdk, setSdk] = useState<HoneycombReactNativeSDK | null>(null);
 
-const sdk = new HoneycombReactNativeSDK({
-  endpoint: `http://${localhost}:4318`,
-  serviceName: 'astronomy-shop-rn',
-  logLevel: DiagLogLevel.DEBUG,
-});
-sdk.start();
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
 
-function onTraceClick() {
-  let span = trace
-    .getTracer('astronomy-shop-example')
-    .startSpan('button-click');
-  console.log('the trace button was clicked!');
-  
-  setTimeout(() => {
-    span.end();
-  },2000);
-}
+    // Initialize SDK with configured endpoint
+    const honeycombSDK = new HoneycombReactNativeSDK({
+      endpoint: otelEndpoint,
+      serviceName: 'astronomy-shop-rn',
+      logLevel: DiagLogLevel.DEBUG,
+    });
+    honeycombSDK.start();
+    setSdk(honeycombSDK);
 
-export default function App() {
-  const [statusText, setStatusText] = useState('');
+    console.log('Honeycomb SDK initialized with endpoint:', otelEndpoint);
 
-  async function onFlushClick() {
-    setStatusText('Flushing...');
-    await sdk.shutdown();
-    setStatusText('Flushed');
+    // Cleanup on unmount
+    return () => {
+      honeycombSDK.shutdown();
+    };
+  }, [otelEndpoint, isLoading]);
+
+  // Show loading screen while configuration is being loaded
+  if (isLoading || !sdk) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#841584" />
+      </View>
+    );
   }
 
+  return <AppNavigator sdk={sdk} />;
+}
+
+/**
+ * Root App Component
+ * Wraps app with ConfigProvider
+ */
+export default function App() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🔭 Astronomy Shop</Text>
-      <Text style={styles.subtitle}>React Native OpenTelemetry Demo</Text>
-      <Button
-        onPress={onTraceClick}
-        title="Send a trace"
-        testID="send_trace"
-        color="#841584"
-        accessibilityLabel="send_trace_button"
-      />
-      <Button
-        onPress={onFlushClick}
-        title="Flush"
-        testID="flush"
-        color="#841584"
-        accessibilityLabel="flush_button"
-      />
-      <Text id="status" testID="status">
-        {statusText}
-      </Text>
-    </View>
+    <ConfigProvider>
+      <AppContent />
+    </ConfigProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  loadingContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 16,
-    textAlign: 'center',
+    backgroundColor: '#fff',
   },
 });
