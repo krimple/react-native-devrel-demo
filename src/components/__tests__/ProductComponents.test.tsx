@@ -8,6 +8,16 @@ import { ProductCard } from '../ProductCard';
 import { QuantitySelector } from '../QuantitySelector';
 import { CartItem } from '../CartItem';
 import { Product } from '../../types';
+import { ConfigProvider } from '../../context/ConfigContext';
+
+// Test wrapper with providers
+const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+  return <ConfigProvider>{children}</ConfigProvider>;
+};
+
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(ui, { wrapper: AllTheProviders });
+};
 
 const mockProduct: Product = {
   id: '1',
@@ -25,7 +35,7 @@ const mockProduct: Product = {
 describe('ProductCard', () => {
   it('renders product info', () => {
     const mockPress = jest.fn();
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ProductCard product={mockProduct} onPress={mockPress} />,
     );
     expect(getByText('Telescope')).toBeDefined();
@@ -34,7 +44,7 @@ describe('ProductCard', () => {
 
   it('calls onPress when tapped', () => {
     const mockPress = jest.fn();
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <ProductCard product={mockProduct} onPress={mockPress} />,
     );
     fireEvent.press(getByText('Telescope'));

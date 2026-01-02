@@ -1,6 +1,7 @@
 module.exports = {
   preset: 'react-native',
-  moduleNameMapping: {
+  moduleNameMapper: {
+    '^@env$': '<rootDir>/jest.setup.js',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@components/(.*)$': '<rootDir>/src/components/$1',
     '^@screens/(.*)$': '<rootDir>/src/screens/$1',
@@ -14,6 +15,6 @@ module.exports = {
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|@honeycombio)/)',
+    'node_modules/(?!(react-native|@react-native|@honeycombio|@react-navigation)/)',
   ],
 };

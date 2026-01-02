@@ -13,7 +13,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { trace, SpanStatusCode } from '@opentelemetry/api';
+import { trace, SpanStatusCode, context } from '@opentelemetry/api';
 import { RootStackParamList } from '../navigation/types';
 import { ProductService } from '../services/ProductService';
 import { useConfig } from '../context/ConfigContext';
@@ -37,12 +37,18 @@ export const ProductListScreen: React.FC<Props> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
+  const [screenSpan, setScreenSpan] = useState<any>(null);
 
   useEffect(() => {
-    // Create screen view span
+    // Create screen view span and keep it active for the screen lifetime
     const span = tracer.startSpan('screen.product_list.view');
     span.setAttribute('screen.name', 'ProductList');
-    span.end();
+    setScreenSpan(span);
+
+    return () => {
+      // End span when screen unmounts
+      span.end();
+    };
   }, []);
 
   useEffect(() => {
@@ -54,30 +60,40 @@ export const ProductListScreen: React.FC<Props> = ({ navigation }) => {
   const loadProducts = async () => {
     if (!selectedCurrency) return;
 
-    const span = tracer.startSpan('product_list.load');
-    span.setAttribute('currency', selectedCurrency.code);
+    // Run product fetch within screen span context if available
+    const executeLoad = async () => {
+      const span = tracer.startSpan('product_list.load');
+      span.setAttribute('currency', selectedCurrency.code);
 
-    try {
-      setLoading(true);
-      setError(null);
+      try {
+        setLoading(true);
+        setError(null);
 
-      const response = await ProductService.fetchProducts(
-        apiEndpoint,
-        selectedCurrency.code,
-      );
+        const response = await ProductService.fetchProducts(
+          apiEndpoint,
+          selectedCurrency.code,
+        );
 
-      setProducts(response.data || []);
-      span.setAttribute('product.count', response.data?.length || 0);
-      span.setStatus({ code: SpanStatusCode.OK });
-    } catch (err: any) {
-      console.error('Failed to load products:', err);
-      setError(err.message || 'Failed to load products');
-      span.setStatus({ code: SpanStatusCode.ERROR, message: err.message });
-      span.recordException(err);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-      span.end();
+        setProducts(response.data || []);
+        span.setAttribute('product.count', response.data?.length || 0);
+        span.setStatus({ code: SpanStatusCode.OK });
+      } catch (err: any) {
+        console.error('Failed to load products:', err);
+        setError(err.message || 'Failed to load products');
+        span.setStatus({ code: SpanStatusCode.ERROR, message: err.message });
+        span.recordException(err);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+        span.end();
+      }
+    };
+
+    // Execute within screen span context if available
+    if (screenSpan) {
+      await context.with(trace.setSpan(context.active(), screenSpan), executeLoad);
+    } else {
+      await executeLoad();
     }
   };
 

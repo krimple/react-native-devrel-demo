@@ -32,6 +32,10 @@ function AppContent() {
       endpoint: otelEndpoint,
       serviceName: 'astronomy-shop-rn',
       logLevel: DiagLogLevel.DEBUG,
+      fetchInstrumentationConfig: {
+        enabled: true,
+        propagateTraceHeaderCorsUrls: [/.+/g], // Propagate to all URLs
+      },
     });
     honeycombSDK.start();
     setSdk(honeycombSDK);

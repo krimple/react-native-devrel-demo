@@ -13,6 +13,25 @@ jest.mock('@opentelemetry/api');
 
 const mockApiEndpoint = 'https://test.example.com/api';
 
+// API response format (before transformation)
+const mockApiProducts = [
+  {
+    id: '1',
+    name: 'Telescope',
+    description: 'A great telescope',
+    priceUsd: {
+      units: 299,
+      nanos: 990000000,
+      currencyCode: 'USD',
+    },
+    picture: 'telescope.jpg',
+    categories: ['Telescopes'],
+  },
+];
+
+const mockApiProduct = mockApiProducts[0];
+
+// Expected transformed Product format
 const mockProducts: Product[] = [
   {
     id: '1',
@@ -23,7 +42,7 @@ const mockProducts: Product[] = [
     picture: 'telescope.jpg',
     category: 'Telescopes',
     rating: 4.5,
-    reviewCount: 10,
+    reviewCount: 0,
     inStock: true,
   },
 ];
@@ -43,7 +62,7 @@ describe('ProductService', () => {
     it('should fetch product list with currency code', async () => {
       (api.get as jest.Mock).mockResolvedValue({
         success: true,
-        data: mockProducts,
+        data: mockApiProducts,
       });
 
       const result = await ProductService.fetchProducts(mockApiEndpoint, 'USD');
@@ -51,7 +70,6 @@ describe('ProductService', () => {
       expect(api.get).toHaveBeenCalledWith(
         mockApiEndpoint,
         '/products?currencyCode=USD',
-        undefined,
       );
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockProducts);
@@ -73,7 +91,7 @@ describe('ProductService', () => {
     it('should use default currency if not provided', async () => {
       (api.get as jest.Mock).mockResolvedValue({
         success: true,
-        data: mockProducts,
+        data: mockApiProducts,
       });
 
       await ProductService.fetchProducts(mockApiEndpoint);
@@ -81,7 +99,6 @@ describe('ProductService', () => {
       expect(api.get).toHaveBeenCalledWith(
         mockApiEndpoint,
         '/products?currencyCode=USD',
-        undefined,
       );
     });
   });
@@ -90,7 +107,7 @@ describe('ProductService', () => {
     it('should fetch single product by ID', async () => {
       (api.get as jest.Mock).mockResolvedValue({
         success: true,
-        data: mockProduct,
+        data: mockApiProduct,
       });
 
       const result = await ProductService.fetchProductById(
@@ -102,7 +119,6 @@ describe('ProductService', () => {
       expect(api.get).toHaveBeenCalledWith(
         mockApiEndpoint,
         '/products/1?currencyCode=USD',
-        undefined,
       );
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockProduct);
@@ -121,7 +137,7 @@ describe('ProductService', () => {
     it('should add product ID to span attributes', async () => {
       (api.get as jest.Mock).mockResolvedValue({
         success: true,
-        data: mockProduct,
+        data: mockApiProduct,
       });
 
       await ProductService.fetchProductById(mockApiEndpoint, '1', 'USD');

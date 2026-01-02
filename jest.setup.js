@@ -13,6 +13,21 @@ jest.mock('@env', () => ({
   JAEGER_ENABLED: 'true',
 }));
 
+// Mock AsyncStorage
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  __esModule: true,
+  default: {
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn(),
+    getAllKeys: jest.fn(),
+    multiGet: jest.fn(),
+    multiSet: jest.fn(),
+    multiRemove: jest.fn(),
+  },
+}));
+
 // Mock Honeycomb SDK
 jest.mock('@honeycombio/opentelemetry-react-native', () => ({
   HoneycombReactNativeSDK: jest.fn().mockImplementation(() => ({
@@ -21,23 +36,46 @@ jest.mock('@honeycombio/opentelemetry-react-native', () => ({
   })),
 }));
 
-// Mock OpenTelemetry API
-jest.mock('@opentelemetry/api', () => ({
-  trace: {
-    getTracer: jest.fn().mockReturnValue({
-      startSpan: jest.fn().mockReturnValue({
-        setStatus: jest.fn(),
-        end: jest.fn(),
-        addEvent: jest.fn(),
-        recordException: jest.fn(),
+// Mock DiagLogLevel
+jest.mock('@opentelemetry/api', () => {
+  const actual = jest.requireActual('@opentelemetry/api');
+  return {
+    ...actual,
+    DiagLogLevel: {
+      NONE: 0,
+      ERROR: 30,
+      WARN: 50,
+      INFO: 60,
+      DEBUG: 70,
+      VERBOSE: 80,
+      ALL: 9999,
+    },
+    trace: {
+      getTracer: jest.fn().mockReturnValue({
+        startSpan: jest.fn().mockReturnValue({
+          setAttribute: jest.fn(),
+          setAttributes: jest.fn(),
+          setStatus: jest.fn(),
+          end: jest.fn(),
+          addEvent: jest.fn(),
+          recordException: jest.fn(),
+        }),
       }),
-    }),
-  },
-  SpanStatusCode: {
-    OK: 1,
-    ERROR: 2,
-  },
-}));
+    },
+    SpanStatusCode: {
+      OK: 1,
+      ERROR: 2,
+    },
+    context: {
+      active: jest.fn(),
+      with: jest.fn((ctx, fn) => fn()),
+    },
+    propagation: {
+      inject: jest.fn(),
+      extract: jest.fn(),
+    },
+  };
+});
 
 // Silence console.log during tests
 global.console = {

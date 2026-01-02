@@ -40,7 +40,6 @@ describe('CurrencyService', () => {
       expect(api.get).toHaveBeenCalledWith(
         mockApiEndpoint,
         '/currency',
-        undefined,
       );
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockCurrencies);
